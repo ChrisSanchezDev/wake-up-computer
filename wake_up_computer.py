@@ -6,12 +6,21 @@ from wakeonlan import send_magic_packet
 
 load_dotenv()
 
-AVAILABLE_COMPUTERS = {
-    'MSI': {'mac': os.getenv('MSI_MAC'), 'ip': os.getenv('MSI_IP')},
-    'PI': {'mac': os.getenv('PI_MAC'), 'ip': os.getenv('PI_IP')},
-    'TANK': {'mac': os.getenv('TANK_MAC'), 'ip': os.getenv('TANK_IP')},
-    'TP': {'mac': os.getenv('TANK_MAC'), 'ip': os.getenv('TANK_IP')}
-}
+IP_TYPE = os.getenv('IP_TYPE')
+if IP_TYPE == 'local':
+    AVAILABLE_COMPUTERS = {
+        'MSI': {'mac': os.getenv('MSI_MAC'), 'ip': os.getenv('MSI_LOCAL_IP')},
+        'PI': {'mac': os.getenv('PI_MAC'), 'ip': os.getenv('PI_LOCAL_IP')},
+        'TANK': {'mac': os.getenv('TANK_MAC'), 'ip': os.getenv('TANK_LOCAL_IP')},
+        'TP': {'mac': os.getenv('TP_MAC'), 'ip': os.getenv('TP_LOCAL_IP')}
+    }
+elif IP_TYPE == 'tailscale':
+    AVAILABLE_COMPUTERS = {
+        'MSI': {'mac': os.getenv('MSI_MAC'), 'ip': os.getenv('MSI_TS_IP')},
+        'PI': {'mac': os.getenv('PI_MAC'), 'ip': os.getenv('PI_TS_IP')},
+        'TANK': {'mac': os.getenv('TANK_MAC'), 'ip': os.getenv('TANK_TS_IP')},
+        'TP': {'mac': os.getenv('TP_MAC'), 'ip': os.getenv('TP_TS_IP')}
+    }
 
 async def wake_and_check(computer:str):
     target = AVAILABLE_COMPUTERS.get(computer)
