@@ -8,7 +8,7 @@ load_dotenv()
 
 AVAILABLE_COMPUTERS = {
     'MSI': {'mac': os.getenv('MSI_MAC'), 'ip': os.getenv('MSI_IP')},
-    'PI': {'mac': os.getenv('PI_MAC'), 'ip': os.getenv('PI_IP'),
+    'PI': {'mac': os.getenv('PI_MAC'), 'ip': os.getenv('PI_IP')},
     'TANK': {'mac': os.getenv('TANK_MAC'), 'ip': os.getenv('TANK_IP')},
     'TP': {'mac': os.getenv('TANK_MAC'), 'ip': os.getenv('TANK_IP')}
 }
@@ -31,12 +31,12 @@ async def wake_and_check(computer:str):
         print(f'Error: Could not collect ip address from {computer}.')
         return
     process = await asyncio.create_subprocess_exec(
-        'ping', param, 1, target['ip'],
+        'ping', param, '1', target['ip'],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
 
-    return_code = process.wait()
+    return_code = await process.wait()
 
     if return_code == 0:
         print(f'{computer} is Online!')
@@ -63,3 +63,5 @@ async def main(user_input:str):
 if __name__ == '__main__':
     user_input = input('Input the computer(s) you want to wake up (MSI PI TANK TP):')
     asyncio.run(main(user_input))
+
+#/home/chrissanchezdev/scripts/wake-up-computer/venv/bin/python3.13 wake_up_computer.py
