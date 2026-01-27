@@ -1,6 +1,7 @@
 import asyncio
 import os
 import subprocess
+import platform # For OS detection
 from dotenv import load_dotenv
 from wakeonlan import send_magic_packet
 
@@ -22,52 +23,56 @@ elif IP_TYPE == 'tailscale':
         'TP': {'mac': os.getenv('TP_MAC'), 'ip': os.getenv('TP_TS_IP')}
     }
 
-async def wake_and_check(computer:str):
+def wake_device(computer: str):
+    computer = computer.upper()
     target = AVAILABLE_COMPUTERS.get(computer)
 
-    if not target or not target['mac']:
-        print(f'Error: Could not collect mac address from {computer}.')
-        return
-    print(f'Sending Magic Packet to {computer}...')
-    send_magic_packet(target['mac'])
+# async def wake_and_check(computer:str):
+#     target = AVAILABLE_COMPUTERS.get(computer)
 
-    print(f'Now waiting 45s to check for proper boot from {computer}...')
-    await asyncio.sleep(45)
+#     if not target or not target['mac']:
+#         print(f'Error: Could not collect mac address from {computer}.')
+#         return
+#     print(f'Sending Magic Packet to {computer}...')
+#     send_magic_packet(target['mac'])
 
-    print(f'Attempting to ping {computer}...')
-    param = '-n' if os.name == 'nt' else '-c' # Windows machines are considered nt machines in the os.name (os from import os)
-    if not target['ip']:
-        print(f'Error: Could not collect ip address from {computer}.')
-        return
-    process = await asyncio.create_subprocess_exec(
-        'ping', param, '1', target['ip'],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+#     print(f'Now waiting 45s to check for proper boot from {computer}...')
+#     await asyncio.sleep(45)
 
-    return_code = await process.wait()
+#     print(f'Attempting to ping {computer}...')
+#     param = '-n' if os.name == 'nt' else '-c' # Windows machines are considered nt machines in the os.name (os from import os)
+#     if not target['ip']:
+#         print(f'Error: Could not collect ip address from {computer}.')
+#         return
+#     process = await asyncio.create_subprocess_exec(
+#         'ping', param, '1', target['ip'],
+#         stdout=subprocess.DEVNULL,
+#         stderr=subprocess.DEVNULL
+#     )
 
-    if return_code == 0:
-        print(f'{computer} is Online!')
-    else:
-        print(f'Error: {computer} is still Offline. Code: {return_code}')
+#     return_code = await process.wait()
+
+#     if return_code == 0:
+#         print(f'{computer} is Online!')
+#     else:
+#         print(f'Error: {computer} is still Offline. Code: {return_code}')
 
 
-async def main(user_input:str):
-    user_input = user_input.upper()
-    commands = user_input.split(' ')
+# async def main(user_input:str):
+#     user_input = user_input.upper()
+#     commands = user_input.split(' ')
 
-    tasks = []
+#     tasks = []
 
-    for computer in commands:
-        if computer in AVAILABLE_COMPUTERS:
-            tasks.append(wake_and_check(computer))
+#     for computer in commands:
+#         if computer in AVAILABLE_COMPUTERS:
+#             tasks.append(wake_and_check(computer))
 
-    if not tasks:
-        print('No valid computers found.')
-        return
+#     if not tasks:
+#         print('No valid computers found.')
+#         return
     
-    await asyncio.gather(*tasks) # * Unpacks the task list into its parts (like MSI, PI, TANK)
+#     await asyncio.gather(*tasks) # * Unpacks the task list into its parts (like MSI, PI, TANK)
     
 if __name__ == '__main__':
     user_input = input('Input the computer(s) you want to wake up (MSI PI TANK TP):')
